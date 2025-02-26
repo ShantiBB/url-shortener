@@ -37,9 +37,14 @@ func main() {
 
 	log.Info("saved url", slog.Int64("id", id))
 
-	_ = storage
+	getUrl, err := storage.GetURL("google")
 
-	// TODO: init storage: sqlite
+	if err != nil {
+		log.Error("failed to get url", sl.Err(err))
+		os.Exit(1)
+	}
+
+	log.Info("getting url: %s", slog.String("url", getUrl))
 
 	// TODO: init router
 

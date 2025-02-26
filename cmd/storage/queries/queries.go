@@ -10,3 +10,5 @@ const CreateURLTable string = `
 `
 
 const CreateURL string = `INSERT INTO url(url, alias) VALUES(?, ?)`
+
+const GetURLByAlias string = `SELECT url FROM url WHERE alias = ?`
