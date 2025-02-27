@@ -3,8 +3,9 @@ package main
 import (
 	"log/slog"
 	"os"
+
 	"url-shortener/cmd/internal/config"
-	sl "url-shortener/cmd/internal/lib/logger/slog"
+	"url-shortener/cmd/internal/lib/logger/slog"
 	"url-shortener/cmd/internal/storage/sqlite"
 )
 
