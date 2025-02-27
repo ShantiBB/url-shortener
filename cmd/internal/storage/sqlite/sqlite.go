@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"url-shortener/cmd/storage/queries"
 
 	"github.com/mattn/go-sqlite3"
 
 	"url-shortener/cmd/internal/storage"
+	"url-shortener/cmd/internal/storage/queries"
 )
 
 type Storage struct {
