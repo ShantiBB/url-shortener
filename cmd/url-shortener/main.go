@@ -1,10 +1,13 @@
 package main
 
 import (
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"os"
 
 	"url-shortener/cmd/internal/config"
+	mwLogger "url-shortener/cmd/internal/http-server/middleware/logger"
 	"url-shortener/cmd/internal/lib/logger/slog"
 	"url-shortener/cmd/internal/storage/sqlite"
 )
@@ -47,7 +50,13 @@ func main() {
 
 	log.Info("getting url: %s", slog.String("url", getUrl))
 
-	// TODO: init router
+	r := chi.NewRouter()
+
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(mwLogger.New(log))
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.URLFormat)
 
 	// TODO: run server
 }
