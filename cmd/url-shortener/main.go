@@ -1,15 +1,16 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"os"
 
 	"url-shortener/cmd/internal/config"
 	mwLogger "url-shortener/cmd/internal/http-server/middleware/logger"
-	"url-shortener/cmd/internal/lib/logger/slog"
+	sl "url-shortener/cmd/internal/lib/logger/slog"
 	"url-shortener/cmd/internal/storage/sqlite"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const (
