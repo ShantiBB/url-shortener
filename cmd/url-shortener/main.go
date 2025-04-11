@@ -4,52 +4,50 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"url-shortener/cmd/internal/config"
 	mwLogger "url-shortener/cmd/internal/http-server/middleware/logger"
 	sl "url-shortener/cmd/internal/lib/logger/slog"
-	"url-shortener/cmd/internal/storage/sqlite"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-)
-
-const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
+	"url-shortener/cmd/internal/repository"
+	svc "url-shortener/cmd/internal/service"
+	"url-shortener/cmd/internal/storage/postgres"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	log := setupLogger(cfg.Env)
-
+	log := sl.SetupLogger(cfg.Env)
 	log.Info("starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	storage, err := sqlite.New(cfg.StoragePath)
-
+	storage, err := postgres.New(cfg.StorageURL)
 	if err != nil {
 		log.Error("failed to init storage", sl.Err(err))
 		os.Exit(1)
 	}
+	service := svc.NewURLService(&repository.Storage{Storage: storage}, log)
 
-	id, err := storage.SaveURL("https://google.com", "google")
-	if err != nil {
-		log.Error("failed to save url", sl.Err(err))
+	if err = service.SaveURL("https://google_delete.com", "google_delete"); err != nil {
 		os.Exit(1)
 	}
 
-	log.Info("saved url", slog.Int64("id", id))
-
-	getUrl, err := storage.GetURL("google")
-
-	if err != nil {
-		log.Error("failed to get url", sl.Err(err))
+	if err = service.GetURL("google_delete"); err != nil {
 		os.Exit(1)
 	}
 
-	log.Info("getting url: %s", slog.String("url", getUrl))
+	if err = service.DeleteURL("google_delete"); err != nil {
+		os.Exit(1)
+	}
+
+	if err = service.SaveURL("https://google.com", "google"); err != nil {
+		os.Exit(1)
+	}
+
+	if err = service.GetURL("google"); err != nil {
+		os.Exit(1)
+	}
 
 	r := chi.NewRouter()
 
@@ -60,33 +58,4 @@ func main() {
 	r.Use(middleware.URLFormat)
 
 	// TODO: run server
-}
-
-func setupLogger(env string) *slog.Logger {
-	var log *slog.Logger
-
-	switch env {
-	case envLocal:
-		log = slog.New(
-			slog.NewTextHandler(
-				os.Stdout,
-				&slog.HandlerOptions{Level: slog.LevelDebug},
-			),
-		)
-	case envDev:
-		log = slog.New(
-			slog.NewJSONHandler(
-				os.Stdout,
-				&slog.HandlerOptions{Level: slog.LevelDebug},
-			),
-		)
-	case envProd:
-		log = slog.New(
-			slog.NewJSONHandler(
-				os.Stdout,
-				&slog.HandlerOptions{Level: slog.LevelInfo},
-			),
-		)
-	}
-	return log
 }
