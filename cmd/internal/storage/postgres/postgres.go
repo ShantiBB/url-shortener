@@ -1,9 +1,9 @@
-package sqlite
+package postgres
 
 import (
 	"database/sql"
 	"fmt"
-
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"url-shortener/cmd/internal/storage/queries"
 )
 
@@ -11,20 +11,19 @@ type Storage struct {
 	Db *sql.DB
 }
 
-func New(storagePath string) (*Storage, error) {
-	const op = "storage.sqlite.New"
+func New(storageURL string) (*Storage, error) {
+	const op = "storage.New"
 
-	db, err := sql.Open("sqlite3", storagePath)
+	db, err := sql.Open("pgx", storageURL)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	stmt, err := db.Prepare(queries.CreateURLTable)
-	if err != nil {
+	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	_, err = stmt.Exec()
+	_, err = db.Exec(queries.CreateURLTable)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
