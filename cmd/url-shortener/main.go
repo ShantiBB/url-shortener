@@ -31,23 +31,13 @@ func main() {
 	}
 	service := svc.NewURLService(&repository.Storage{Storage: storage}, log)
 
-	if err = service.SaveURL("https://google_delete.com", "google_delete"); err != nil {
-		os.Exit(1)
-	}
-
-	if err = service.GetURL("google_delete"); err != nil {
-		os.Exit(1)
-	}
-
-	if err = service.DeleteURL("google_delete"); err != nil {
-		os.Exit(1)
-	}
-
 	if err = service.SaveURL("https://google.com", "google"); err != nil {
 		os.Exit(1)
 	}
-
 	if err = service.GetURL("google"); err != nil {
+		os.Exit(1)
+	}
+	if err = service.DeleteURL("google"); err != nil {
 		os.Exit(1)
 	}
 

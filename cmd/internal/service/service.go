@@ -24,7 +24,7 @@ func (s *URLService) SaveURL(url, alias string) error {
 		s.logger.Error("failed to create URL", "alias", alias, "error", err)
 		return fmt.Errorf("service.CreateURL: %w", err)
 	}
-	s.logger.Info("create URL", "id", id, "alias", alias)
+	s.logger.Info("create URL", "id", id, "alias", alias, "url", url)
 
 	return nil
 }
@@ -35,7 +35,7 @@ func (s *URLService) GetURL(alias string) error {
 		s.logger.Error("failed to retrieve URL", "error", err)
 		return fmt.Errorf("service.RetrieveURL: %w", err)
 	}
-	s.logger.Info("get URL", "url", url)
+	s.logger.Info("get URL", "alias", alias, "url", url)
 
 	return nil
 }
