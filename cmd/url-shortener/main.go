@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,7 +17,8 @@ import (
 )
 
 func main() {
-	cfg := config.MustLoad()
+	configPath := filepath.Join("cmd", "config", "local.yaml")
+	cfg := config.MustLoad(configPath)
 
 	log := sl.SetupLogger(cfg.Env)
 	log.Info("starting url-shortener", slog.String("env", cfg.Env))
