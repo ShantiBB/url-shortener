@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"url-shortener/cmd/internal/storage"
 	"url-shortener/cmd/internal/storage/postgres"
 	"url-shortener/cmd/internal/storage/queries"
@@ -24,9 +25,11 @@ func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 	var id int64
 	err = stmt.QueryRow(urlToSave, alias).Scan(&id)
 	if err != nil {
+		if strings.Contains(err.Error(), "unique constraint") {
+			return 0, storage.ErrURLExists
+		}
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
-
 	return id, nil
 }
 
