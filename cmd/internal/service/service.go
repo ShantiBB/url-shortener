@@ -11,7 +11,7 @@ type URLService struct {
 	logger *slog.Logger
 }
 
-func NewURLService(repo *repository.Storage, log *slog.Logger) *URLService {
+func New(repo *repository.Storage, log *slog.Logger) *URLService {
 	return &URLService{
 		repo:   repo,
 		logger: log,
