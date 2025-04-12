@@ -2,17 +2,17 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 
 	"url-shortener/cmd/internal/config"
-	mwLogger "url-shortener/cmd/internal/http-server/middleware/logger"
+	urlRouter "url-shortener/cmd/internal/http-server/router"
 	sl "url-shortener/cmd/internal/lib/logger/slog"
 	"url-shortener/cmd/internal/repository"
-	svc "url-shortener/cmd/internal/service"
+	"url-shortener/cmd/internal/service"
 	"url-shortener/cmd/internal/storage/postgres"
 )
 
@@ -21,7 +21,6 @@ func main() {
 	cfg := config.MustLoad(configPath)
 
 	log := sl.SetupLogger(cfg.Env)
-	log.Info("starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
 	storage, err := postgres.New(cfg.StorageURL)
@@ -29,25 +28,30 @@ func main() {
 		log.Error("failed to init storage", sl.Err(err))
 		os.Exit(1)
 	}
-	service := svc.NewURLService(&repository.Storage{Storage: storage}, log)
 
-	if err = service.SaveURL("https://google.com", "google"); err != nil {
+	repo := repository.Storage{Storage: storage}
+	svc := service.New(&repo, log)
+
+	router := chi.NewRouter()
+	urlRouter.URLRouter(router, log, svc)
+
+	log.Info("starting url-shortener server", slog.String(
+		"env", cfg.Env),
+		slog.String("address", cfg.HTTPServer.Address),
+	)
+
+	server := &http.Server{
+		Addr:         cfg.HTTPServer.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	if err = server.ListenAndServe(); err != nil {
+		log.Error("failed to start server", sl.Err(err))
 		os.Exit(1)
 	}
-	if err = service.GetURL("google"); err != nil {
-		os.Exit(1)
-	}
-	if err = service.DeleteURL("google"); err != nil {
-		os.Exit(1)
-	}
 
-	r := chi.NewRouter()
-
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
-	r.Use(mwLogger.New(log))
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.URLFormat)
-
-	// TODO: run server
+	log.Error("stopped server")
 }
