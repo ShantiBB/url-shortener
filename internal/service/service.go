@@ -3,8 +3,7 @@ package service
 import (
 	"fmt"
 	"log/slog"
-
-	"url-shortener/cmd/internal/repository"
+	"url-shortener/internal/repository"
 )
 
 type URLService struct {

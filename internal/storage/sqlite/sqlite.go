@@ -3,8 +3,7 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-
-	"url-shortener/cmd/internal/storage/queries"
+	"url-shortener/internal/storage/queries"
 )
 
 type Storage struct {

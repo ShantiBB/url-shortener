@@ -3,10 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"url-shortener/internal/storage/queries"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-
-	"url-shortener/cmd/internal/storage/queries"
 )
 
 type Storage struct {

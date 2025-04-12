@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"url-shortener/cmd/internal/storage"
-	"url-shortener/cmd/internal/storage/postgres"
-	"url-shortener/cmd/internal/storage/queries"
+	"url-shortener/internal/storage"
+	"url-shortener/internal/storage/postgres"
+	"url-shortener/internal/storage/queries"
 )
 
 type Storage struct {

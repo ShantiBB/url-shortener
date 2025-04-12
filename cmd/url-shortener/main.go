@@ -5,19 +5,18 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"url-shortener/internal/config"
+	urlRouter "url-shortener/internal/http-server/router"
+	"url-shortener/internal/lib/logger/slog"
+	"url-shortener/internal/repository"
+	"url-shortener/internal/service"
+	"url-shortener/internal/storage/postgres"
 
 	"github.com/go-chi/chi/v5"
-
-	"url-shortener/cmd/internal/config"
-	urlRouter "url-shortener/cmd/internal/http-server/router"
-	sl "url-shortener/cmd/internal/lib/logger/slog"
-	"url-shortener/cmd/internal/repository"
-	"url-shortener/cmd/internal/service"
-	"url-shortener/cmd/internal/storage/postgres"
 )
 
 func main() {
-	configPath := filepath.Join("cmd", "config", "local.yaml")
+	configPath := filepath.Join("config", "local.yaml")
 	cfg := config.MustLoad(configPath)
 
 	log := sl.SetupLogger(cfg.Env)

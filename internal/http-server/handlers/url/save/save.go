@@ -4,15 +4,14 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	resp "url-shortener/internal/lib/api/response"
+	"url-shortener/internal/lib/logger/slog"
+	"url-shortener/internal/lib/random"
+	"url-shortener/internal/storage"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
-
-	resp "url-shortener/cmd/internal/lib/api/response"
-	sl "url-shortener/cmd/internal/lib/logger/slog"
-	"url-shortener/cmd/internal/lib/random"
-	"url-shortener/cmd/internal/storage"
 )
 
 const aliasLength = 6
