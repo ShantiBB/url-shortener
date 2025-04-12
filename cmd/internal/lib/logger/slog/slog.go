@@ -3,8 +3,6 @@ package sl
 import (
 	"log/slog"
 	"os"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const (

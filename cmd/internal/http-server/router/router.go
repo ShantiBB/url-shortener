@@ -1,13 +1,14 @@
 package router
 
 import (
+	"log/slog"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"log/slog"
-	"url-shortener/cmd/internal/http-server/handlers/url/save"
-	"url-shortener/cmd/internal/service"
 
+	"url-shortener/cmd/internal/http-server/handlers/url/save"
 	mwLogger "url-shortener/cmd/internal/http-server/middleware/logger"
+	"url-shortener/cmd/internal/service"
 )
 
 func URLRouter(router *chi.Mux, log *slog.Logger, service *service.URLService) {

@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log/slog"
+
 	"url-shortener/cmd/internal/repository"
 )
 
