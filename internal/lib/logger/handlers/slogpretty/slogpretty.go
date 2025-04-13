@@ -6,6 +6,7 @@ import (
 	"io"
 	stdLog "log"
 	"log/slog"
+	"os"
 
 	"github.com/fatih/color"
 )
@@ -19,6 +20,18 @@ type PrettyHandler struct {
 	slog.Handler
 	l     *stdLog.Logger
 	attrs []slog.Attr
+}
+
+func SetupPrettySlog() *slog.Logger {
+	opts := &PrettyHandlerOptions{
+		SlogOpts: &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		},
+	}
+
+	handler := opts.NewPrettyHandler(os.Stdout)
+
+	return slog.New(handler)
 }
 
 func (opts PrettyHandlerOptions) NewPrettyHandler(out io.Writer) *PrettyHandler {

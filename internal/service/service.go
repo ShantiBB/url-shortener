@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log/slog"
+
 	"url-shortener/internal/repository"
 )
 
@@ -29,15 +30,15 @@ func (s *URLService) SaveURL(url, alias string) error {
 	return nil
 }
 
-func (s *URLService) GetURL(alias string) error {
+func (s *URLService) GetURL(alias string) (string, error) {
 	url, err := s.repo.GetURL(alias)
 	if err != nil {
 		s.logger.Error("failed to retrieve URL", "error", err)
-		return fmt.Errorf("service.RetrieveURL: %w", err)
+		return "", fmt.Errorf("service.RetrieveURL: %w", err)
 	}
 	s.logger.Info("get URL", "alias", alias, "url", url)
 
-	return nil
+	return url, nil
 }
 
 func (s *URLService) DeleteURL(alias string) error {

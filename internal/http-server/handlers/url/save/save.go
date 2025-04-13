@@ -4,14 +4,15 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	resp "url-shortener/internal/lib/api/response"
-	"url-shortener/internal/lib/logger/slog"
-	"url-shortener/internal/lib/random"
-	"url-shortener/internal/storage"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
+
+	resp "url-shortener/internal/lib/api/response"
+	"url-shortener/internal/lib/logger/slog"
+	"url-shortener/internal/lib/random"
+	"url-shortener/internal/storage"
 )
 
 const aliasLength = 6
@@ -38,11 +39,11 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		log = log.With(slog.String("op", op), slog.String("request_id", getReqID))
 
 		var req Request
-
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			log.Error("failed to decode request", sl.Err(err))
 
+			w.WriteHeader(http.StatusBadRequest) // 400
 			render.JSON(w, r, resp.Error("failed to decode request"))
 
 			return
@@ -55,8 +56,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			errors.As(err, &validateErr)
 
 			log.Error("invalid request", sl.Err(err))
-
-			render.JSON(w, r, resp.Error("invalid request"))
+			w.WriteHeader(http.StatusBadRequest) // 400
 			render.JSON(w, r, resp.ValidationError(validateErr))
 
 			return
@@ -69,17 +69,20 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 
 		err = urlSaver.SaveURL(req.URL, alias)
 		if errors.Is(err, storage.ErrURLExists) {
+			w.WriteHeader(http.StatusConflict) // 409
 			render.JSON(w, r, resp.Error("url already exists"))
 
 			return
 		}
 
 		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError) // 500
 			render.JSON(w, r, resp.Error("failed to save URL"))
 
 			return
 		}
 
+		w.WriteHeader(http.StatusCreated) // 201
 		render.JSON(w, r, Response{
 			Response: resp.OK(),
 			Alias:    alias,

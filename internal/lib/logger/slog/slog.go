@@ -3,6 +3,8 @@ package sl
 import (
 	"log/slog"
 	"os"
+
+	"url-shortener/internal/lib/logger/handlers/slogpretty"
 )
 
 const (
@@ -16,12 +18,7 @@ func SetupLogger(env string) *slog.Logger {
 
 	switch env {
 	case envLocal:
-		log = slog.New(
-			slog.NewTextHandler(
-				os.Stdout,
-				&slog.HandlerOptions{Level: slog.LevelDebug},
-			),
-		)
+		log = slogpretty.SetupPrettySlog()
 	case envDev:
 		log = slog.New(
 			slog.NewJSONHandler(
